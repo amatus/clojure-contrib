@@ -367,20 +367,25 @@
 (defn fetch-val
   "Return a state-monad function that assumes the state to be a map and
    returns the value corresponding to the given key. The state is not modified."
-  [key]
-  (domonad state-m
-    [s (fetch-state)]
-    (key s)))
+  ([key]
+    (fetch-val key nil))
+  ([key zero]
+    (domonad state-m
+      [s (fetch-state)]
+      (get s key zero))))
 
 (defn update-val
   "Return a state-monad function that assumes the state to be a map and
    replaces the value associated with the given key by the return value
    of f applied to the old value. The old value is returned."
-  [key f]
-  (fn [s]
-    (let [old-val (get s key)
-	  new-s   (assoc s key (f old-val))]
-      [old-val new-s])))
+  ([key f]
+    (update-val key nil f))
+  ([key zero f]
+    (fn [s]
+      (let [old-val (get s key zero)
+           new-s   (assoc s key (f old-val))]
+        [old-val new-s]))))
+
 
 (defn set-val
   "Return a state-monad function that assumes the state to be a map and
