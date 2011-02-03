@@ -72,8 +72,10 @@
    monad comprehension expression mexpr."
   [mexpr step]
   (let [[bform expr] step]
-    (cond (identical? bform :when)  `(if ~expr ~mexpr ~'m-zero)
-	  (identical? bform :let)   `(let ~expr ~mexpr)
+    (cond (identical? bform :when)      `(if ~expr ~mexpr ~'m-zero)
+	  (identical? bform :when-not)  `(if ~expr ~'m-zero ~mexpr)
+	  (identical? bform :let)       `(let ~expr ~mexpr)
+	  (identical? bform :when-let)  `(if-let ~expr ~mexpr ~'m-zero)
 	  :else (list 'm-bind expr (list 'fn [bform] mexpr)))))
 
 (defn- monad-expr
